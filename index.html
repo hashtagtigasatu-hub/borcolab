@@ -563,15 +563,8 @@ var products = [
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_TEAL_ORANGE',
     beforeImg: 't1709.jpg',
     afterImg: 't1final.jpg',
-    nodes: [
-      { label: 'Input Bal', desc: 'Koreksi primer — white balance dan exposure dasar', enabled: true },
-      { label: 'Skin Key', desc: 'Qualifier isolasi skin tone ~20°–35°', enabled: true },
-      { label: 'Teal Push', desc: 'Color Warper mendorong shadow ke cyan-teal', enabled: true },
-      { label: 'HSL', desc: 'Boost saturasi orange secara selektif', enabled: true },
-      { label: 'Vignette', desc: 'Power Window melembutkan tepi frame', enabled: false },
-      { label: 'Output', desc: 'Gain trim final + legal range clip', enabled: true },
-    ]
   },
+  
   {
     id: 'golden-hour-pg',
     type: 'powergrade',
@@ -584,17 +577,10 @@ var products = [
     price: 'Rp 49.000',
     priceNote: 'sekali bayar · download langsung',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_GOLDEN_HOUR',
-    beforeImg: 't1709.jpg',
-    afterImg: 't1final.jpg',
-    nodes: [
-      { label: 'WB Shift', desc: 'Temperature +200–350K dari WB neutral', enabled: true },
-      { label: 'Log Mid', desc: 'Log Gamma lift untuk detail wajah', enabled: true },
-      { label: 'Sky Key', desc: 'Counter-correction range langit ke neutral-warm', enabled: true },
-      { label: 'Sat Boost', desc: 'Sat vs Sat boost di range orange/yellow', enabled: true },
-      { label: 'Lift Warm', desc: 'Offset warm subtle di shadow', enabled: true },
-      { label: 'Bloom', desc: 'Glow OFX simulasi lens halation', enabled: false },
-    ]
+    beforeImg: 't2709.jpg',
+    afterImg: 't2final.jpg',
   },
+  
   {
     id: 'clean-skin-pg',
     type: 'powergrade',
@@ -609,16 +595,8 @@ var products = [
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_CLEAN_SKIN',
     beforeImg: 't1709.jpg',
     afterImg: 't1final.jpg',
-    nodes: [
-      { label: 'Primary', desc: 'Koreksi teknis — white point dan exposure', enabled: true },
-      { label: 'Skin Qual', desc: 'Qualifier HSL isolasi skin range', enabled: true },
-      { label: 'Skin HvH', desc: 'Hue vs Hue nudge skin ke skin-tone line', enabled: true },
-      { label: 'Luma Shp', desc: 'Curves highlight rolloff untuk texture kulit', enabled: true },
-      { label: 'BG Key', desc: 'Inverted matte — background treatment terpisah', enabled: true },
-      { label: 'Noise Red', desc: 'NR temporal selektif di area skin', enabled: false },
-      { label: 'Output', desc: 'Gain trim — cek parade scope', enabled: true },
-    ]
   },
+  
   {
     id: 'cinematic-lut-pack',
     type: 'lut',
@@ -633,13 +611,8 @@ var products = [
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_CINEMATIC_PACK',
     beforeImg: 't1709.jpg',
     afterImg: 't1final.jpg',
-    nodes: [
-      { label: 'Input', desc: 'Signal input — log atau linear', enabled: true },
-      { label: 'CST', desc: 'Color Space Transform ke working space', enabled: true },
-      { label: '.cube LUT', desc: 'Creative LUT — inti dari pack ini', enabled: true },
-      { label: 'Strength', desc: 'Blend key untuk mengatur intensitas LUT', enabled: false },
-    ]
   },
+  
   {
     id: 'skin-lut-pack',
     type: 'lut',
@@ -654,11 +627,6 @@ var products = [
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_SKIN_LUT',
     beforeImg: 't1709.jpg',
     afterImg: 't1final.jpg',
-    nodes: [
-      { label: 'Input', desc: 'Signal input', enabled: true },
-      { label: 'Skin LUT', desc: 'LUT optimized untuk skin hue range', enabled: true },
-      { label: 'Fine Trim', desc: 'Ruang untuk trim per-scene', enabled: false },
-    ]
   },
 ];
 
