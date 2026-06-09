@@ -557,7 +557,7 @@ var products = [
     sub: 'Complementary split — warm skin, cool shadow',
     desc: 'Power grade sinematik klasik dengan split teal-orange. Skin tone dijaga hangat lewat qualifier terpisah, shadow didorong ke cyan-teal secara selektif.',
     usage: 'Cocok untuk footage dengan pencahayaan warm dan background neutral/cool. Skin harus exposed dengan benar — jika clipped, qualifier akan misbehave.',
-    compat: ['.drp', 'DaVinci Resolve 18+', 'BMD Film / S-Log3'],
+    requires: ['Tetra DCTL', 'DaVinci Resolve', 'BMD Film 4K / S-Log3'],
     price: 'Rp 49.000',
     priceNote: 'sekali bayar · download langsung',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_TEAL_ORANGE',
@@ -699,9 +699,11 @@ function buildExpandedCard(p) {
   bodyHTML += '<div class="card-top"><div><div class="card-title">' + p.name + '</div><div class="card-sub">' + p.sub + '</div></div>';
   bodyHTML += '<div class="' + badgeCls + '">' + badgeLabel + '</div></div>';
   bodyHTML += '<div class="card-desc">' + p.desc + '</div>';
+  bodyHTML += '<div style="margin-bottom:10px;">';
+  bodyHTML += '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--danger);margin-bottom:6px;">Requires</div>';
   bodyHTML += '<div class="compat-chips">';
-  p.compat.forEach(function(c) { bodyHTML += '<span class="compat-chip">' + c + '</span>'; });
-  bodyHTML += '</div>';
+  p.requires.forEach(function(c) { bodyHTML += '<span class="compat-chip">' + c + '</span>'; });
+  bodyHTML += '</div></div>';
   bodyHTML += '<div class="usage-note"><strong>Tips:</strong> ' + p.usage + '</div>';
   bodyHTML += '<div class="card-footer">';
   bodyHTML += '<div><div class="card-price">' + p.price + '</div><div class="card-price-sub">' + p.priceNote + '</div></div>';
@@ -726,8 +728,15 @@ function buildExpandedCard(p) {
 
   return card;
 }
-
+/* ── TOGGLE CARD ── */
 function toggleCard(pid) {
+  var allCards = document.querySelectorAll('.card-expanded');
+  allCards.forEach(function(c) {
+    if (c.id !== 'card-exp-' + pid && c.classList.contains('open')) {
+      c.classList.remove('open');
+    }
+  });
+
   var card = document.getElementById('card-exp-' + pid);
   if (!card) return;
   var isOpen = card.classList.toggle('open');
