@@ -405,39 +405,6 @@
       * { transition: none !important; animation: none !important; }
     }
 
-    /* THUMBNAIL MODE */
-    .thumb-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .card-thumb {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden;
-      cursor: pointer; transition: border-color 0.15s, transform 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .card-thumb:active { transform: scale(0.97); }
-    .card-thumb:hover { border-color: rgba(240,255,0,0.35); }
-
-    .thumb-img {
-      width: 100%; aspect-ratio: 16/9;
-      object-fit: cover; display: block;
-    }
-    .thumb-placeholder {
-      width: 100%; aspect-ratio: 16/9;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .thumb-info { padding: 8px 10px 10px; }
-    .thumb-name {
-      font-family: var(--mono); font-size: 11px; font-weight: 700;
-      color: var(--text); line-height: 1.3; margin-bottom: 3px;
-    }
-    .thumb-price { font-family: var(--mono); font-size: 11px; color: var(--accent); }
-
     /* EXPANDED CARD (mirip section guide.html) */
     .card-expanded {
       background: var(--surface); border: 1px solid var(--border);
@@ -617,10 +584,8 @@ var products = [
     price: 'Rp 49.000',
     priceNote: 'sekali bayar · download langsung',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_GOLDEN_HOUR',
-    beforeImg: '',
-    afterImg: '',
-    beforeGrad: '#5C4A30',
-    afterGrad: '#7A5A28',
+    beforeImg: 't1709.jpg',
+    afterImg: 't1final.jpg',
     nodes: [
       { label: 'WB Shift', desc: 'Temperature +200–350K dari WB neutral', enabled: true },
       { label: 'Log Mid', desc: 'Log Gamma lift untuk detail wajah', enabled: true },
@@ -642,10 +607,8 @@ var products = [
     price: 'Rp 59.000',
     priceNote: 'sekali bayar · download langsung',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_CLEAN_SKIN',
-    beforeImg: '',
-    afterImg: '',
-    beforeGrad: '#5A4030',
-    afterGrad: '#4A3828',
+    beforeImg: 't1709.jpg',
+    afterImg: 't1final.jpg',
     nodes: [
       { label: 'Primary', desc: 'Koreksi teknis — white point dan exposure', enabled: true },
       { label: 'Skin Qual', desc: 'Qualifier HSL isolasi skin range', enabled: true },
@@ -668,10 +631,8 @@ var products = [
     price: 'Rp 79.000',
     priceNote: '8 LUT · sekali bayar',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_CINEMATIC_PACK',
-    beforeImg: '',
-    afterImg: '',
-    beforeGrad: '#444',
-    afterGrad: '#2A3040',
+    beforeImg: 't1709.jpg',
+    afterImg: 't1final.jpg',
     nodes: [
       { label: 'Input', desc: 'Signal input — log atau linear', enabled: true },
       { label: 'CST', desc: 'Color Space Transform ke working space', enabled: true },
@@ -691,10 +652,8 @@ var products = [
     price: 'Rp 65.000',
     priceNote: '5 LUT · sekali bayar',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_SKIN_LUT',
-    beforeImg: '',
-    afterImg: '',
-    beforeGrad: '#5A4030',
-    afterGrad: '#C07050',
+    beforeImg: 't1709.jpg',
+    afterImg: 't1final.jpg',
     nodes: [
       { label: 'Input', desc: 'Signal input', enabled: true },
       { label: 'Skin LUT', desc: 'LUT optimized untuk skin hue range', enabled: true },
@@ -789,6 +748,7 @@ function buildExpandedCard(p) {
         '<div><div class="card-exp-title">' + p.name + '</div><div class="card-exp-sub">' + p.price + '</div></div>' +
       '</div>' +
       '<div class="card-exp-right">' +
+        '<div class="' + (p.type === 'lut' ? 'card-badge blue' : 'card-badge') + '">' + (p.type === 'lut' ? 'LUT Pack' : 'Power Grade') + '</div>' +
         '<div class="card-exp-chevron">▼</div>' +
       '</div>' +
     '</div>' +
@@ -804,10 +764,11 @@ function toggleCard(pid) {
   if (!card) return;
   var isOpen = card.classList.toggle('open');
   if (isOpen) {
+    sliderStates[pid] = 0.5;
     setTimeout(function() {
       card.scrollIntoView({ behavior: 'smooth', block: 'start' });
       initSlider(pid);
-      autoAnimate(pid);
+      setTimeout(function() { autoAnimate(pid); }, 300);
     }, 50);
   }
 }
@@ -839,15 +800,6 @@ function renderProducts() {
   }
   empty.classList.remove('visible');
 
-  /* thumbnail grid */
-  var grid = document.createElement('div');
-  grid.className = 'thumb-grid';
-  filtered.forEach(function(p) {
-    grid.appendChild(buildThumb(p));
-  });
-  list.appendChild(grid);
-
-  /* expanded cards di bawah grid */
   filtered.forEach(function(p) {
     list.appendChild(buildExpandedCard(p));
   });
@@ -903,17 +855,26 @@ function updateSlider(pid, pos) {
 function autoAnimate(pid) {
   var duration = 1100;
   var start = null;
-  var from = 0.5, to = 0.8, returning = false;
-  var animating = true;
+  var from = 0.5, to = 0.82, returning = false;
+  var cancelled = false;
+
+  var wrap = document.getElementById('sim-' + pid);
+  if (!wrap) return;
+
+  function onDrag() { cancelled = true; }
+  wrap.addEventListener('mousedown', onDrag, { once: true });
+  wrap.addEventListener('touchstart', onDrag, { once: true });
 
   function step(ts) {
-    if (!animating || sliderStates[pid] !== 0.5) return;
+    if (cancelled) return;
     if (!start) start = ts;
     var progress = Math.min((ts - start) / duration, 1);
     var ease = progress < 0.5
       ? 2 * progress * progress
       : -1 + (4 - 2 * progress) * progress;
-    var pos = returning ? to + (from - to) * ease : from + (to - from) * ease;
+    var pos = returning
+      ? to + (from - to) * ease
+      : from + (to - from) * ease;
     sliderStates[pid] = pos;
     updateSlider(pid, pos);
     if (progress < 1) {
@@ -923,10 +884,10 @@ function autoAnimate(pid) {
       setTimeout(function() { requestAnimationFrame(step); }, 500);
     } else {
       sliderStates[pid] = 0.5;
-      animating = false;
+      updateSlider(pid, 0.5);
     }
   }
-  setTimeout(function() { requestAnimationFrame(step); }, 400 + Math.random() * 400);
+  requestAnimationFrame(step);
 }
 
 /* ── NODE TOGGLE ── */
