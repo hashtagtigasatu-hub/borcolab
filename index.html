@@ -628,9 +628,6 @@ function buildExpandedCard(p) {
     ? '<img src="' + p.afterImg + '" alt="' + p.name + '">'
     : '<div class="icon-grad" style="background:linear-gradient(135deg,' + p.afterGrad + 'cc,' + p.afterGrad + '44)"></div>';
 
-  var badgeCls = p.type === 'lut' ? 'card-badge blue' : 'card-badge';
-  var badgeLabel = p.type === 'lut' ? 'LUT Pack' : 'Power Grade';
-
   /* simulator HTML */
   var simHTML = '<div class="sim-wrap" id="sim-' + p.id + '">';
   if (p.beforeImg) {
@@ -649,7 +646,7 @@ function buildExpandedCard(p) {
   /* card body */
   var bodyHTML = '<div class="card-body">';
   bodyHTML += '<div class="card-top"><div><div class="card-title">' + p.name + '</div><div class="card-sub">' + p.sub + '</div></div>';
-  bodyHTML += '<div class="' + badgeCls + '">' + badgeLabel + '</div></div>';
+  bodyHTML += '</div>';
   bodyHTML += '<div class="card-desc">' + p.desc + '</div>';
   bodyHTML += '<div style="margin-bottom:10px;">';
   bodyHTML += '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--danger);margin-bottom:6px;">Requires</div>';
