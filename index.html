@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Grade Library</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1A1A1F;
+    --surface: #252530;
+    --border: #2F2F3D;
+    --accent-warm: #E8C170;
+    --accent-cool: #7B9CDB;
+    --text-primary: #E2E2EC;
+    --text-muted: #A0A0B0;
+    --text-dim: #5C5C70;
+    --node-green: #5EC47B;
+    --node-orange: #E8924A;
+    --node-blue: #5B9BD5;
+    --node-purple: #9B7BD5;
+    --node-teal: #4EC4C0;
+    --node-red: #D55B5B;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NODE GRAPH AMBIENT BACKGROUND ── */
+  #node-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.18;
+  }
+
+  /* ── LAYOUT ── */
+  .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── HEADER ── */
+  header {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+
+  h1 span {
+    color: var(--accent-warm);
+  }
+
+  .header-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+    max-width: 420px;
+    margin-top: 10px;
+    line-height: 1.7;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  .meta-stat {
+    text-align: right;
+  }
+
+  .meta-stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent-warm);
+    line-height: 1;
+  }
+
+  .meta-stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .meta-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--border);
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    padding: 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(26, 26, 31, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 10;
+  }
+
+  .filter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+
+  .filter-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--accent-warm);
+    color: var(--accent-warm);
+  }
+
+  .filter-btn.active {
+    background: var(--accent-warm);
+    border-color: var(--accent-warm);
+    color: #1A1A1F;
+  }
+
+  /* ── GRADE GRID ── */
+  .grade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    margin-top: 40px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── GRADE CARD ── */
+  .grade-card {
+    background: var(--surface);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grade-card:hover {
+    background: #2C2C38;
+  }
+
+  .grade-card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+  /* ── BEFORE/AFTER SLIDER ── */
+  .ba-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .ba-before, .ba-after {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .ba-after {
+    clip-path: inset(0 50% 0 0);
+    transition: clip-path 0s;
+  }
+
+  .ba-label {
+    position: absolute;
+    bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 6px;
+    background: rgba(0,0,0,0.55);
+    border-radius: 2px;
+  }
+
+  .ba-label-before { left: 8px; color: var(--text-muted); }
+  .ba-label-after  { right: 8px; color: var(--accent-warm); }
+
+  .ba-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(255,255,255,0.6);
+    transform: translateX(-50%);
+    cursor: ew-resize;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .ba-handle::before, .ba-handle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    top: 50%;
+    margin-top: -14px;
+  }
+
+  .ba-handle::after {
+    width: 24px;
+    height: 24px;
+    margin-top: -12px;
+    background: var(--bg);
+    border: 2px solid rgba(255,255,255,0.8);
+  }
+
+  /* ── CARD BODY ── */
+  .card-body {
+    padding: 16px 18px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .card-title-group { flex: 1; }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .card-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .card-category {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 2px;
+    background: rgba(232, 193, 112, 0.12);
+    color: var(--accent-warm);
+    border: 1px solid rgba(232, 193, 112, 0.25);
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  .card-category.cool {
+    background: rgba(123, 156, 219, 0.12);
+    color: var(--accent-cool);
+    border-color: rgba(123, 156, 219, 0.25);
+  }
+
+  .card-category.neutral {
+    background: rgba(160, 160, 176, 0.1);
+    color: var(--text-muted);
+    border-color: rgba(160, 160, 176, 0.2);
+  }
+
+  /* ── NODE TAGS ── */
+  .node-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .node-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 3px 7px;
+    border-radius: 2px;
+    border: 1px solid;
+    position: relative;
+  }
+
+  .node-tag::before {
+    content: '●';
+    font-size: 6px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .nt-green  { color: var(--node-green);  border-color: rgba(94,196,123,0.25);  background: rgba(94,196,123,0.07);  }
+  .nt-orange { color: var(--node-orange); border-color: rgba(232,146,74,0.25);  background: rgba(232,146,74,0.07);  }
+  .nt-blue   { color: var(--node-blue);   border-color: rgba(91,155,213,0.25);  background: rgba(91,155,213,0.07);  }
+  .nt-purple { color: var(--node-purple); border-color: rgba(155,123,213,0.25); background: rgba(155,123,213,0.07); }
+  .nt-teal   { color: var(--node-teal);   border-color: rgba(78,196,192,0.25);  background: rgba(78,196,192,0.07);  }
+  .nt-red    { color: var(--node-red);    border-color: rgba(213,91,91,0.25);   background: rgba(213,91,91,0.07);   }
+
+  /* ── CARD FOOTER ── */
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-node-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .card-arrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-warm);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.15s ease;
+  }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    max-width: 720px;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    transform: translateY(16px);
+    transition: transform 0.2s ease;
+    position: relative;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 2;
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover { border-color: var(--text-muted); color: var(--text-primary); }
+
+  .modal-preview {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .modal-ba-before, .modal-ba-after {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .modal-ba-after {
+    clip-path: inset(0 50% 0 0);
+  }
+
+  .modal-ba-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    transform: translateX(-50%);
+    cursor: ew-resize;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .modal-ba-handle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid rgba(255,255,255,0.8);
+    top: 50%;
+    margin-top: -14px;
+  }
+
+  .modal-body {
+    padding: 28px;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .modal-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ── NODE GRAPH VISUAL ── */
+  .node-graph-section {
+    margin-top: 24px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .node-graph-visual {
+    background: #1E1E25;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .node-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: max-content;
+  }
+
+  .node-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .node-box {
+    width: 100px;
+    padding: 8px 10px;
+    border: 1px solid;
+    border-radius: 3px;
+    text-align: center;
+    position: relative;
+  }
+
+  .node-box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+
+  .node-box-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  .nb-green  { border-color: rgba(94,196,123,0.4);  background: rgba(94,196,123,0.06);  color: var(--node-green);  }
+  .nb-orange { border-color: rgba(232,146,74,0.4);  background: rgba(232,146,74,0.06);  color: var(--node-orange); }
+  .nb-blue   { border-color: rgba(91,155,213,0.4);  background: rgba(91,155,213,0.06);  color: var(--node-blue);   }
+  .nb-purple { border-color: rgba(155,123,213,0.4); background: rgba(155,123,213,0.06); color: var(--node-purple); }
+  .nb-teal   { border-color: rgba(78,196,192,0.4);  background: rgba(78,196,192,0.06);  color: var(--node-teal);   }
+  .nb-red    { border-color: rgba(213,91,91,0.4);   background: rgba(213,91,91,0.06);   color: var(--node-red);    }
+  .nb-dim    { border-color: var(--border);          background: rgba(255,255,255,0.03); color: var(--text-dim);    }
+
+  .node-connector {
+    width: 24px;
+    height: 1px;
+    background: var(--text-dim);
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .node-connector::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -3px;
+    width: 0;
+    height: 0;
+    border-left: 4px solid var(--text-dim);
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+  }
+
+  /* ── NODE DESCRIPTIONS ── */
+  .node-descriptions {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .node-desc-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(47,47,61,0.6);
+  }
+
+  .node-desc-row:last-child { border-bottom: none; }
+
+  .node-desc-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding-top: 1px;
+  }
+
+  .node-desc-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .node-desc-text em {
+    font-style: normal;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* ── USAGE NOTE ── */
+  .usage-note {
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: rgba(232, 193, 112, 0.05);
+    border-left: 2px solid var(--accent-warm);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .usage-note-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 6px;
+  }
+
+  .usage-note p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    padding: 80px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    display: none;
+  }
+
+  .empty-state.visible { display: block; }
+
+  .empty-state-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    margin-bottom: 16px;
+    opacity: 0.4;
+  }
+
+  .empty-state p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── SCROLL HINT ── */
+  .scroll-hint {
+    padding: 40px 0 60px;
+    text-align: center;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .grade-grid { grid-template-columns: 1fr; }
+    .header-inner { flex-direction: column; align-items: flex-start; }
+    .modal-body { padding: 20px; }
+    .node-desc-row { grid-template-columns: 90px 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="node-canvas"></canvas>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="header-label">Borneo Color Lab</div>
+        <h1>Power Grade<br><span>Library</span></h1>
+        <p class="header-desc">A reference index of production-ready grades. Each entry documents the node structure, tool chain, and intent — built for DaVinci Resolve.</p>
+      </div>
+      <div class="header-meta">
+        <div class="meta-stat">
+          <div class="meta-stat-num" id="grade-count">6</div>
+          <div class="meta-stat-label">Grades</div>
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-stat">
+          <div class="meta-stat-num">DV</div>
+          <div class="meta-stat-label">Resolve</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Filter —</span>
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="cinematic">Cinematic</button>
+    <button class="filter-btn" data-filter="commercial">Commercial</button>
+    <button class="filter-btn" data-filter="skin">Skin Tone</button>
+    <button class="filter-btn" data-filter="log">Log / LUT</button>
+    <button class="filter-btn" data-filter="fx">FX / Style</button>
+  </div>
+
+  <!-- GRADE GRID -->
+  <div class="grade-grid" id="grade-grid"></div>
+  <div class="empty-state" id="empty-state">
+    <div class="empty-state-icon">[ ]</div>
+    <p>No grades in this category</p>
+  </div>
+
+  <div class="scroll-hint">── end of library ──</div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modal-close">ESC ✕</button>
+    <div class="modal-preview" id="modal-preview"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ───────────────────────────────────────────────
+   NODE CANVAS AMBIENT BACKGROUND
+─────────────────────────────────────────────── */
+(function() {
+  const canvas = document.getElementById('node-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes = [], edges = [];
+
+  function init() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    nodes = [];
+    edges = [];
+    const count = Math.floor((W * H) / 28000);
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+        r: Math.random() * 2 + 1,
+        c: Math.random() > 0.5 ? '#E8C170' : '#7B9CDB'
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 140) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(123,156,219,${0.35 * (1 - d/140)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = n.c;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', init);
+  init();
+  draw();
+})();
+
+/* ───────────────────────────────────────────────
+   DATA
+─────────────────────────────────────────────── */
+const grades = [
+  {
+    id: 'teal-orange',
+    name: 'Teal & Orange',
+    subtitle: 'Complementary split — warm skin, cool shadow',
+    category: 'cinematic',
+    categoryLabel: 'Cinematic',
+    categoryClass: '',
+    nodeCount: 7,
+    beforeBg: '#4A3B28',
+    afterBg: '#2B3A3F',
+    beforeAccent: '#A0876A',
+    afterAccent: '#E89250',
+    tags: [
+      { label: 'Color Warper', cls: 'nt-teal' },
+      { label: 'Hue vs Sat', cls: 'nt-orange' },
+      { label: 'Qualifier', cls: 'nt-green' },
+      { label: 'Node Layer', cls: 'nt-blue' },
+      { label: 'Gain', cls: 'nt-purple' },
+    ],
+    nodes: [
+      { label: 'Input Bal.', type: 'Color Wheel', cls: 'nb-dim' },
+      { label: 'Lift/Gamma', type: 'Log Wheels', cls: 'nb-dim' },
+      { label: 'Skin Key', type: 'Qualifier', cls: 'nb-orange' },
+      { label: 'Teal Shad.', type: 'Color Warper', cls: 'nb-teal' },
+      { label: 'HSL', type: 'Hue vs Sat', cls: 'nb-green' },
+      { label: 'Vignette', type: 'Power Window', cls: 'nb-purple' },
+      { label: 'Output', type: 'Gain', cls: 'nb-blue' },
+    ],
+    nodeDescs: [
+      { name: 'Input Bal.', cls: 'nt-dim', text: 'Primary balance — neutral Lift, slight warm bias on Gain. Sets the base exposure before any creative work.' },
+      { name: 'Lift/Gamma', cls: 'nt-dim', text: 'Log Wheels used to compress shadows and open midtones. Shadow detail is preserved rather than crushed.' },
+      { name: 'Skin Key', cls: 'nt-orange', text: 'Qualifier isolates skin hue range (~20°–35° on vectorscope). <em>Softness 30–40%.</em> Protects skin from the teal push applied downstream.' },
+      { name: 'Teal Shad.', cls: 'nt-teal', text: 'Color Warper remaps shadow hues toward cyan-teal (180°–200°). Controls applied via Hue vs Hue curve to avoid affecting midtones.' },
+      { name: 'HSL', cls: 'nt-green', text: 'Hue vs Sat boosts orange saturation selectively (+15–20%). Keeps teal range neutral to avoid oversaturation in shadows.' },
+      { name: 'Vignette', cls: 'nt-purple', text: 'Circular Power Window, feather 50%. Darkens 0.3 stops at the frame edge to draw focus inward. <em>Not a hard falloff.</em>' },
+      { name: 'Output', cls: 'nt-blue', text: 'Final Gain trim. Clip highlights at legal range (1023 in 10-bit). Check scopes — keep skin between 60–75% on waveform.' },
+    ],
+    usage: 'Best used on footage with warm practical lighting and neutral/cool backgrounds — corporate, interview, narrative. Skin must be properly exposed; if clipped, the Qualifier will misbehave.',
+  },
+  {
+    id: 'bleach-bypass',
+    name: 'Bleach Bypass',
+    subtitle: 'Desaturated highs, crushed blacks, high contrast',
+    category: 'fx',
+    categoryLabel: 'FX / Style',
+    categoryClass: 'cool',
+    nodeCount: 5,
+    beforeBg: '#6B6B6B',
+    afterBg: '#2A2A2A',
+    beforeAccent: '#9A9A9A',
+    afterAccent: '#C8C0A8',
+    tags: [
+      { label: 'Curves', cls: 'nt-blue' },
+      { label: 'Sat Node', cls: 'nt-purple' },
+      { label: 'Soft Clip', cls: 'nt-red' },
+      { label: 'Matte', cls: 'nt-teal' },
+    ],
+    nodes: [
+      { label: 'Exposure', type: 'Log Wheels', cls: 'nb-dim' },
+      { label: 'Contrast S', type: 'Curves', cls: 'nb-blue' },
+      { label: 'Sat Crush', type: 'Sat Curves', cls: 'nb-purple' },
+      { label: 'Hi Clip', type: 'Soft Clip', cls: 'nb-red' },
+      { label: 'Matte Lum.', type: 'Luma Matte', cls: 'nb-teal' },
+    ],
+    nodeDescs: [
+      { name: 'Exposure', cls: 'nt-dim', text: 'Lift the blacks by about 3–5% on the waveform to avoid pure black. This is intentional — bleach bypass reads flatter in shadows.' },
+      { name: 'Contrast S', cls: 'nt-blue', text: 'Custom S-curve with a hard shoulder — <em>not the default Contrast slider.</em> The highlight rolloff starts earlier than usual, at about 75% luminance.' },
+      { name: 'Sat Crush', cls: 'nt-purple', text: 'Sat vs Lum curve: desaturate specifically in the highlight range (above 70%). Midtone and shadow saturation is kept to preserve skin readability.' },
+      { name: 'Hi Clip', cls: 'nt-red', text: 'Soft Clip OFX set to 85% ceiling. Prevents harsh clipping without losing the blown-out quality that defines the look.' },
+      { name: 'Matte Lum.', cls: 'nt-teal', text: 'Luma matte fed into a parallel node that adds a slight warm tone to shadows only. Avoids the look going fully cold and flat.' },
+    ],
+    usage: 'Designed for high-contrast scenes — harsh sunlight, industrial environments, action sequences. Does not work well on flat-lit interview footage.',
+  },
+  {
+    id: 'golden-hour',
+    name: 'Golden Hour',
+    subtitle: 'Warm amber lift, open highlights, rich midtones',
+    category: 'cinematic',
+    categoryLabel: 'Cinematic',
+    categoryClass: '',
+    nodeCount: 6,
+    beforeBg: '#5C4A30',
+    afterBg: '#7A5A28',
+    beforeAccent: '#A88060',
+    afterAccent: '#F0B050',
+    tags: [
+      { label: 'Log Wheels', cls: 'nt-orange' },
+      { label: 'Curves', cls: 'nt-blue' },
+      { label: 'Color Boost', cls: 'nt-green' },
+      { label: 'Qualifier', cls: 'nt-teal' },
+    ],
+    nodes: [
+      { label: 'WB Shift', type: 'Temp/Tint', cls: 'nb-orange' },
+      { label: 'Log Mid.', type: 'Log Wheels', cls: 'nb-dim' },
+      { label: 'Sky Key', type: 'Qualifier', cls: 'nb-teal' },
+      { label: 'Sat Boost', type: 'Sat Curves', cls: 'nb-green' },
+      { label: 'Lift Warm', type: 'Lift Offset', cls: 'nb-orange' },
+      { label: 'Bloom', type: 'Glow OFX', cls: 'nb-purple' },
+    ],
+    nodeDescs: [
+      { name: 'WB Shift', cls: 'nt-orange', text: 'Temperature pushed +200 to +350K warmer than the scene\'s neutral WB. This is the foundation of the look — everything else is built on this warmth.' },
+      { name: 'Log Mid.', cls: 'nt-dim', text: 'Log Gamma lifted slightly to open face detail. Gain kept controlled to prevent blowing out the practical sun sources in frame.' },
+      { name: 'Sky Key', cls: 'nt-teal', text: 'Qualifier selects sky/blue range. A counter-correction pulls sky back toward neutral-warm to prevent it from going too green or cyan.' },
+      { name: 'Sat Boost', cls: 'nt-green', text: 'Sat vs Sat midrange boost — brings out orange/yellow range without clipping. <em>Do not exceed +25 on the boost or it reads as oversaturated on monitors.</em>' },
+      { name: 'Lift Warm', cls: 'nt-orange', text: 'Subtle warm offset in the lift (shadows). Only +3–5 red/+2 yellow. Prevents the shadows from going cold, which breaks the golden-hour illusion.' },
+      { name: 'Bloom', cls: 'nt-purple', text: 'Glow OFX applied lightly (threshold 70%, spread 0.4). Simulates lens halation on practical sources. <em>Render check required — verify it\'s not adding noise.</em>' },
+    ],
+    usage: 'Works best on outdoor natural light footage from the magic hour window. Skin tones need monitoring — use the vectorscope skin-tone line as a hard boundary.',
+  },
+  {
+    id: 'log-neutralizer',
+    name: 'Log Neutralizer',
+    subtitle: 'Clean conversion from S-Log / BRAW to working space',
+    category: 'log',
+    categoryLabel: 'Log / LUT',
+    categoryClass: 'neutral',
+    nodeCount: 4,
+    beforeBg: '#444444',
+    afterBg: '#3A3A3A',
+    beforeAccent: '#888888',
+    afterAccent: '#C0C0C0',
+    tags: [
+      { label: 'IDT / LUT', cls: 'nt-blue' },
+      { label: 'Curves', cls: 'nt-green' },
+      { label: 'CST', cls: 'nt-purple' },
+    ],
+    nodes: [
+      { label: 'CST In', type: 'Color Space', cls: 'nb-purple' },
+      { label: '1D LUT', type: 'LUT Node', cls: 'nb-blue' },
+      { label: 'Trim', type: 'Curves', cls: 'nb-green' },
+      { label: 'CST Out', type: 'Color Space', cls: 'nb-purple' },
+    ],
+    nodeDescs: [
+      { name: 'CST In', cls: 'nt-purple', text: 'Color Space Transform converts the camera-native log gamut (S-Log3/SGamut3, BRAW, C-Log, etc.) into DaVinci Wide Gamut / Intermediate. <em>This must match the camera profile exactly.</em>' },
+      { name: '1D LUT', cls: 'nt-blue', text: 'Technical 1D LUT for linearization only — not a creative look LUT. Corrects any residual gamma nonlinearity from the IDT before the creative nodes.' },
+      { name: 'Trim', cls: 'nt-green', text: 'A minimal Curves node for scene-specific neutralization: WB correction, slight gamma trim. Keep adjustments small here — the purpose is neutral, not graded.' },
+      { name: 'CST Out', cls: 'nt-purple', text: 'Output CST to the project\'s working color space. This node is the handoff point — downstream creative grades read a properly normalized signal from here.' },
+    ],
+    usage: 'Use as the first node group in any log-to-deliverable pipeline. Attach creative grades after the CST Out node, not before. Verify with a chip chart or known reference frame before creative work.',
+  },
+  {
+    id: 'commercial-pop',
+    name: 'Commercial Pop',
+    subtitle: 'Clean, punchy, vibrant — product and brand work',
+    category: 'commercial',
+    categoryLabel: 'Commercial',
+    categoryClass: '',
+    nodeCount: 6,
+    beforeBg: '#4A4A4A',
+    afterBg: '#3A4A55',
+    beforeAccent: '#909090',
+    afterAccent: '#78C8E0',
+    tags: [
+      { label: 'Primaries', cls: 'nt-blue' },
+      { label: 'Sat Curves', cls: 'nt-green' },
+      { label: 'Hue Rot.', cls: 'nt-orange' },
+      { label: 'Sharpen', cls: 'nt-purple' },
+    ],
+    nodes: [
+      { label: 'Primary', type: 'Color Wheel', cls: 'nb-blue' },
+      { label: 'Clean Shad.', type: 'Shadow Key', cls: 'nb-dim' },
+      { label: 'Brand Hue', type: 'Hue Rotation', cls: 'nb-orange' },
+      { label: 'Sat Boost', type: 'Sat Curves', cls: 'nb-green' },
+      { label: 'Clarity', type: 'Sharpen OFX', cls: 'nb-purple' },
+      { label: 'Output Lim.', type: 'Soft Clip', cls: 'nb-red' },
+    ],
+    nodeDescs: [
+      { name: 'Primary', cls: 'nt-blue', text: 'Standard three-way primary correction. Neutral whites, clean shadows. This is not creative — it\'s technical. The goal is a reference-correct starting point.' },
+      { name: 'Clean Shad.', cls: 'nt-dim', text: 'Shadow Qualifier isolates the low-luminance range. A slight cool offset keeps shadows from going muddy-warm. <em>Especially important for product footage on white backgrounds.</em>' },
+      { name: 'Brand Hue', cls: 'nt-orange', text: 'Hue vs Hue curve targets specific brand color ranges. If the brand has a signature color (blue, red, etc.), this node pushes footage hues toward that reference without affecting the full spectrum.' },
+      { name: 'Sat Boost', cls: 'nt-green', text: 'Aggressive Sat vs Lum boost in the midrange — typical commercial look. Monitor carefully on skin — if skin appears on screen, the Sat Boost node must be masked off.' },
+      { name: 'Clarity', cls: 'nt-purple', text: 'Resolve Sharpen OFX at low amount (15–25%), high radius. Adds perceived sharpness without pixel-level noise artifacts. <em>Always compare before/after at 1:1.</em>' },
+      { name: 'Output Lim.', cls: 'nt-red', text: 'Soft Clip at legal range ceiling. Commercial deliverables (broadcast, online ad) must hit spec. Check vectorscope and waveform — no signals outside legal bounds.' },
+    ],
+    usage: 'Designed for product, food, and brand content. Aggressively colorful. Do not use as-is for skin-forward content — the saturation boost will redden or yellow skin tones.',
+  },
+  {
+    id: 'clean-skin',
+    name: 'Clean Skin Grade',
+    subtitle: 'Skin-first grade — interview, documentary, corporate',
+    category: 'skin',
+    categoryLabel: 'Skin Tone',
+    categoryClass: '',
+    nodeCount: 8,
+    beforeBg: '#5A4030',
+    afterBg: '#4A3828',
+    beforeAccent: '#C09070',
+    afterAccent: '#E8A870',
+    tags: [
+      { label: 'Qualifier', cls: 'nt-orange' },
+      { label: 'Hue vs Hue', cls: 'nt-green' },
+      { label: 'Node Matte', cls: 'nt-teal' },
+      { label: 'Curves', cls: 'nt-blue' },
+      { label: 'NR', cls: 'nt-purple' },
+    ],
+    nodes: [
+      { label: 'Primary', type: 'Color Wheel', cls: 'nb-dim' },
+      { label: 'Skin Qual.', type: 'Qualifier', cls: 'nb-orange' },
+      { label: 'Skin HvH', type: 'Hue vs Hue', cls: 'nb-green' },
+      { label: 'Luma Shp.', type: 'Curves', cls: 'nb-blue' },
+      { label: 'Bckgrd Key', type: 'Node Matte', cls: 'nb-teal' },
+      { label: 'BG Neutral', type: 'Sat Curves', cls: 'nb-dim' },
+      { label: 'Noise Red.', type: 'NR (Magic)', cls: 'nb-purple' },
+      { label: 'Output', type: 'Gain Trim', cls: 'nb-dim' },
+    ],
+    nodeDescs: [
+      { name: 'Primary', cls: 'nt-dim', text: 'Neutral primary — the only goal here is correct white point and clean midtone exposure. <em>Do not push any creative tone here.</em> This node is the technical foundation.' },
+      { name: 'Skin Qual.', cls: 'nt-orange', text: 'Qualifier set to HSL with H range ~18°–38°, S range 15–80%, L range 30–85%. Softness minimum 40% to avoid edge artifacts. Matte preview: check for hairline bleed.' },
+      { name: 'Skin HvH', cls: 'nt-green', text: 'Hue vs Hue curve on the skin-qualified node only. Nudges skin hue toward the ideal vectorscope skin-tone line. For most cameras, this means a slight counterclockwise rotation of ~5°–10°.' },
+      { name: 'Luma Shp.', cls: 'nt-blue', text: 'Custom Curves node: slight highlight rolloff to open blown-out skin texture. Primarily affects luminance channel — chroma is left untouched in this node.' },
+      { name: 'Bckgrd Key', cls: 'nt-teal', text: 'Inverted Qualifier matte to isolate background. This is the paired node — everything not skin-keyed goes through here for separate treatment.' },
+      { name: 'BG Neutral', cls: 'nt-dim', text: 'Background desaturation and slight luminance pull. Separates the subject from the background perceptually without hard keying. <em>Keep it subtle — max 15% desaturation.</em>' },
+      { name: 'Noise Red.', cls: 'nt-purple', text: 'Magic Mask or manual Noise Reduction applied only to skin areas. Temporal NR preferred for interview. <em>Check motion — high motion will cause smearing at high NR values.</em>' },
+      { name: 'Output', cls: 'nt-dim', text: 'Final output trim. Skin should sit between 55–72% on the waveform for standard exposure. Use the parade scope — confirm there is no color channel imbalance in the skin highlights.' },
+    ],
+    usage: 'Designed for talking-head, documentary, and corporate video. The Qualifier is the most critical element — every shoot will require a per-clip adjustment. Do not leave the skin-tone line unchecked on the vectorscope.',
+  },
+];
+
+/* ───────────────────────────────────────────────
+   RENDER CARDS
+─────────────────────────────────────────────── */
+const grid = document.getElementById('grade-grid');
+const emptyState = document.getElementById('empty-state');
+let activeFilter = 'all';
+
+function buildCard(g) {
+  const card = document.createElement('div');
+  card.className = 'grade-card';
+  card.dataset.category = g.category;
+
+  card.innerHTML = `
+    <div class="ba-container" data-id="${g.id}-card">
+      <div class="ba-before" style="background: radial-gradient(ellipse at 40% 40%, ${g.beforeAccent} 0%, ${g.beforeBg} 70%);">
+        <span class="ba-label ba-label-before">Before</span>
+      </div>
+      <div class="ba-after" id="ba-after-${g.id}" style="background: radial-gradient(ellipse at 60% 40%, ${g.afterAccent} 0%, ${g.afterBg} 60%);">
+        <span class="ba-label ba-label-after">${g.name}</span>
+      </div>
+      <div class="ba-handle" id="ba-handle-${g.id}"></div>
+    </div>
+    <div class="card-body">
+      <div class="card-top">
+        <div class="card-title-group">
+          <div class="card-title">${g.name}</div>
+          <div class="card-subtitle">${g.subtitle}</div>
+        </div>
+        <div class="card-category ${g.categoryClass}">${g.categoryLabel}</div>
+      </div>
+      <div class="node-list">
+        ${g.tags.map(t => `<span class="node-tag ${t.cls}">${t.label}</span>`).join('')}
+      </div>
+      <div class="card-footer">
+        <span class="card-node-count">${g.nodeCount} nodes</span>
+        <span class="card-arrow">View grade →</span>
+      </div>
+    </div>
+  `;
+
+  // card BA slider
+  const container = card.querySelector('.ba-container');
+  const after = card.querySelector(`#ba-after-${g.id}`);
+  const handle = card.querySelector(`#ba-handle-${g.id}`);
+  initSlider(container, after, handle);
+
+  card.addEventListener('click', () => openModal(g));
+  return card;
+}
+
+function renderGrid(filter) {
+  grid.innerHTML = '';
+  const filtered = filter === 'all' ? grades : grades.filter(g => g.category === filter);
+  if (filtered.length === 0) {
+    emptyState.classList.add('visible');
+  } else {
+    emptyState.classList.remove('visible');
+    filtered.forEach(g => grid.appendChild(buildCard(g)));
+  }
+  document.getElementById('grade-count').textContent = filtered.length;
+}
+
+renderGrid('all');
+
+/* ───────────────────────────────────────────────
+   FILTER
+─────────────────────────────────────────────── */
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    renderGrid(activeFilter);
+  });
+});
+
+/* ───────────────────────────────────────────────
+   BEFORE/AFTER SLIDER
+─────────────────────────────────────────────── */
+function initSlider(container, after, handle) {
+  let dragging = false;
+
+  function setPos(x) {
+    const rect = container.getBoundingClientRect();
+    let pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+    const rightPct = (1 - pct) * 100;
+    after.style.clipPath = `inset(0 ${rightPct}% 0 0)`;
+    handle.style.left = `${pct * 100}%`;
+  }
+
+  container.addEventListener('mousedown', e => {
+    e.stopPropagation();
+    dragging = true;
+    setPos(e.clientX);
+  });
+  container.addEventListener('touchstart', e => {
+    e.stopPropagation();
+    dragging = true;
+    setPos(e.touches[0].clientX);
+  }, { passive: true });
+
+  window.addEventListener('mousemove', e => { if (dragging) setPos(e.clientX); });
+  window.addEventListener('touchmove', e => { if (dragging) setPos(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('mouseup', () => { dragging = false; });
+  window.addEventListener('touchend', () => { dragging = false; });
+}
+
+/* ───────────────────────────────────────────────
+   MODAL
+─────────────────────────────────────────────── */
+const overlay = document.getElementById('modal-overlay');
+const modalClose = document.getElementById('modal-close');
+const modalPreview = document.getElementById('modal-preview');
+const modalBody = document.getElementById('modal-body');
+
+function openModal(g) {
+  // Preview
+  modalPreview.innerHTML = `
+    <div class="modal-ba-before" style="background: radial-gradient(ellipse at 40% 40%, ${g.beforeAccent} 0%, ${g.beforeBg} 70%);">
+    </div>
+    <div class="modal-ba-after" id="modal-after" style="background: radial-gradient(ellipse at 60% 40%, ${g.afterAccent} 0%, ${g.afterBg} 60%);">
+    </div>
+    <div class="modal-ba-handle" id="modal-handle"></div>
+    <span class="ba-label ba-label-before">Before</span>
+    <span class="ba-label ba-label-after">After — ${g.name}</span>
+  `;
+
+  const mAfter = document.getElementById('modal-after');
+  const mHandle = document.getElementById('modal-handle');
+  initSlider(modalPreview, mAfter, mHandle);
+
+  // Node graph visual
+  const nodeFlow = g.nodes.map((n, i) => `
+    <div class="node-block">
+      <div class="node-box ${n.cls}">
+        <div class="node-box-label">${n.label}</div>
+        <div class="node-box-type">${n.type}</div>
+      </div>
+    </div>
+    ${i < g.nodes.length - 1 ? '<div class="node-connector"></div>' : ''}
+  `).join('');
+
+  // Node descriptions
+  const nodeDescs = g.nodeDescs.map(d => `
+    <div class="node-desc-row">
+      <span class="node-desc-name ${d.cls}">${d.name}</span>
+      <span class="node-desc-text">${d.text}</span>
+    </div>
+  `).join('');
+
+  modalBody.innerHTML = `
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">${g.name}</div>
+        <div class="modal-meta">${g.subtitle} &nbsp;·&nbsp; ${g.nodeCount} nodes &nbsp;·&nbsp; ${g.categoryLabel}</div>
+      </div>
+    </div>
+
+    <div class="node-list" style="margin-bottom: 20px;">
+      ${g.tags.map(t => `<span class="node-tag ${t.cls}">${t.label}</span>`).join('')}
+    </div>
+
+    <div class="node-graph-section">
+      <div class="section-label">Node Graph</div>
+      <div class="node-graph-visual">
+        <div class="node-flow">${nodeFlow}</div>
+      </div>
+    </div>
+
+    <div class="node-graph-section">
+      <div class="section-label">Node Breakdown</div>
+      <div class="node-descriptions">${nodeDescs}</div>
+    </div>
+
+    <div class="usage-note">
+      <div class="usage-note-label">Usage Notes</div>
+      <p>${g.usage}</p>
+    </div>
+  `;
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
