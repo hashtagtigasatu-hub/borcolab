@@ -321,7 +321,7 @@
       background: rgba(240,255,0,0.04);
       border-left: 2px solid rgba(240,255,0,0.3);
       border-radius: 0 8px 8px 0;
-      font-size: 11px; color: var(--muted); line-height: 1.7;
+      font-size: 12px; color: var(--muted); line-height: 1.7;
     }
     .usage-note strong { color: var(--accent); }
 
@@ -531,6 +531,18 @@
   <div class="empty-state" id="emptyState">
     <div class="empty-state-text">[ ] Tidak ada produk di kategori ini</div>
   </div>
+  
+  <!-- TOMBOL WA -->
+  <div style="text-align:center;padding:32px 0 0;">
+      <a href="https://wa.me/6282252445233?text=Halo%20Borneo%20Color%20Lab!%20Saya%20mau%20tanya%20tentang%20Power%20Grade%20%26%20LUT%20yang%20tersedia%20%F0%9F%98%8A"
+        style="display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:20px;background:var(--wa);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.06em;color:#fff;text-decoration:none;-webkit-tap-highlight-color:transparent;"
+        target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+          <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.79.49 3.57 1.4 5.12L2 22l5.12-1.51c1.49.82 3.17 1.26 4.92 1.26 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.84 9.84 0 0012.04 2z"/>
+        </svg>
+        Tanya-tanya
+      </a>
+    </div>
 
   <div class="footer">
     <div class="footer-brand">BORNEO COLOR LAB</div>
@@ -539,13 +551,7 @@
 
 </div>
 
-<!-- FLOATING WA -->
-<a href="https://wa.me/6282252445233?text=Halo%20Borneo%20Color%20Lab!%20Saya%20mau%20tanya%20tentang%20Power%20Grade%20%26%20LUT%20yang%20tersedia%20%F0%9F%98%8A" class="btn-wa-float">
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.79.49 3.57 1.4 5.12L2 22l5.12-1.51c1.49.82 3.17 1.26 4.92 1.26 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.84 9.84 0 0012.04 2z"/>
-  </svg>
-  Chat WA
-</a>
+
 
 <!-- BACK TO TOP -->
 <button class="btn-top" id="btnTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
@@ -702,9 +708,9 @@ function buildExpandedCard(p) {
   p.requires.forEach(function(c) { bodyHTML += '<span class="compat-chip">' + c + '</span>'; });
   bodyHTML += '</div></div>';
   bodyHTML += '<div class="usage-note"><strong>Tips:</strong> ' + p.usage + '</div>';
-  bodyHTML += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">';
+  bodyHTML += '<div style="display:flex;align-items:center;gap:6px;margin-top:14px;margin-bottom:4px;">';
   bodyHTML += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="color:var(--muted);flex-shrink:0"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>';
-  bodyHTML += '<span style="font-family:var(--mono);font-size:10px;color:var(--muted);">' + p.buyers + ' colorist sudah menggunakan ini</span>';
+  bodyHTML += '<span style="font-family:var(--mono);font-size:10px;color:var(--muted);">' + p.buyers + 'x dibeli</span>';
   bodyHTML += '</div>';
   bodyHTML += '<div class="card-footer">';
   bodyHTML += '<div><div class="card-price">' + p.price + '</div><div class="card-price-sub">' + p.priceNote + '</div></div>';
