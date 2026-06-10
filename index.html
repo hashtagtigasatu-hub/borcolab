@@ -1031,7 +1031,13 @@ handleHash();
     }
   }
 
-  function draw() {
+  var lastTime = null;
+
+  function draw(ts) {
+    if (lastTime === null) lastTime = ts;
+    var delta = Math.min(ts - lastTime, 32);
+    lastTime = ts;
+
     ctx.clearRect(0, 0, W, H);
     for (var i = 0; i < nodes.length; i++) {
       for (var j = i + 1; j < nodes.length; j++) {
@@ -1049,7 +1055,9 @@ handleHash();
       }
     }
     nodes.forEach(function(n) {
-      n.x += n.vx; n.y += n.vy;
+      var factor = delta / 16;
+      n.x += n.vx * factor;
+      n.y += n.vy * factor;
       if (n.x < 0 || n.x > W) n.vx *= -1;
       if (n.y < 0 || n.y > H) n.vy *= -1;
       ctx.beginPath();
@@ -1061,6 +1069,10 @@ handleHash();
     });
     requestAnimationFrame(draw);
   }
+
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) lastTime = null;
+  });
 
   window.addEventListener('resize', init);
   init();
