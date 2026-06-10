@@ -785,16 +785,40 @@ function autoAnimate(pid) {
   setTimeout(function() { autoAnimate(pid); }, 100);
 }
 
+  /* ── SHARE PRODUCT ── */
   function shareProduct(pid, el) {
   var base = window.location.href.split('#')[0];
   var url = base + '#' + pid;
 
-  if (navigator.share) {
-    navigator.share({ title: document.title, url: url });
+  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isMobile && navigator.share) {
+    navigator.share({ title: document.title, url: url }).catch(function() {
+      copyToClipboard(url, el);
+    });
     return;
   }
 
+  copyToClipboard(url, el);
+}
+
+function copyToClipboard(url, el) {
   navigator.clipboard.writeText(url).then(function() {
+    el.classList.add('copied');
+    el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Tersalin!';
+    setTimeout(function() {
+      el.classList.remove('copied');
+      el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Bagikan';
+    }, 2000);
+  }).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
     el.classList.add('copied');
     el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Tersalin!';
     setTimeout(function() {
