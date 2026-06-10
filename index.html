@@ -81,7 +81,6 @@
     .logo-mark { width: 39px; height: 39px; background: transparent; border-radius: 8px; flex-shrink: 0; }
     .logo-mark img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
     .brand-name { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); line-height: 1; }
-    .brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 3px; }
 
     .logo-mark img {
       animation: logoSpin 11s linear infinite;
@@ -127,13 +126,6 @@
       font-size: 12px; color: var(--text); line-height: 1.8;
       padding-top: 12px; border-top: 1px solid var(--border);
     }
-    .hero-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-    .hero-pill {
-      font-family: var(--mono); font-size: 10px; font-weight: 700;
-      padding: 4px 10px; border-radius: 20px;
-      border: 1px solid var(--border); color: var(--muted);
-      letter-spacing: 0.05em;
-    }
 
     /* FILTER BAR */
     .filter-wrap {
@@ -159,14 +151,6 @@
       font-family: var(--mono); font-size: 9px; font-weight: 700;
       letter-spacing: 0.2em; text-transform: uppercase;
       color: var(--muted); margin: 10px 0 5px; padding-left: 2px;
-    }
-
-    /* PRODUCT CARD */
-    .product-card {
-      margin-bottom: 10px;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
-      transition: background 0.3s, border-color 0.3s;
     }
 
     /* BEFORE/AFTER SLIDER */
@@ -216,95 +200,14 @@
       color: var(--muted); text-transform: uppercase;
     }
 
-    /* NODE GRAPH PREVIEW */
-    .node-graph-bar {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .node-graph-bar::-webkit-scrollbar { display: none; }
-
-    .node-dot {
-      font-family: var(--mono); font-size: 9px; font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 4px 9px; border-radius: 4px;
-      border: 1px solid rgba(240,255,0,0.25);
-      color: var(--accent);
-      background: rgba(240,255,0,0.05);
-      white-space: nowrap; flex-shrink: 0;
-      cursor: pointer;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-    }
-    .node-dot::before {
-      content: '●'; font-size: 6px;
-      margin-right: 5px; vertical-align: middle;
-      opacity: 0.6;
-    }
-    .node-dot.active {
-      background: rgba(240,255,0,0.12);
-      border-color: rgba(240,255,0,0.5);
-    }
-    .node-dot.disabled {
-      opacity: 0.3; cursor: not-allowed;
-      background: transparent;
-      border-color: var(--border);
-      color: var(--muted);
-    }
-
-    .node-connector {
-      width: 16px; height: 1px; background: var(--border);
-      flex-shrink: 0; position: relative;
-    }
-    .node-connector::after {
-      content: ''; position: absolute; right: -1px; top: -3px;
-      border-left: 4px solid var(--border);
-      border-top: 3px solid transparent;
-      border-bottom: 3px solid transparent;
-    }
-
-    /* NODE EFFECT INDICATOR */
-    .node-effect {
-      padding: 8px 16px;
-      border-bottom: 1px solid var(--border);
-      min-height: 36px;
-      display: flex; align-items: center;
-    }
-    .node-effect-text {
-      font-family: var(--mono); font-size: 10px;
-      letter-spacing: 0.05em; color: var(--muted);
-      transition: color 0.2s;
-    }
-    .node-effect-text.lit { color: var(--accent); }
-
     /* CARD BODY */
     .card-body { padding: 14px 16px; }
     .card-top {
       display: flex; align-items: flex-start;
       justify-content: space-between; gap: 8px; margin-bottom: 10px;
     }
-    .card-title {
-      font-family: var(--mono); font-size: 14px; font-weight: 700;
-      color: var(--text); line-height: 1.2;
-    }
+    
     .card-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
-
-    .card-badge {
-      font-family: var(--mono); font-size: 9px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 3px 8px; border-radius: 4px;
-      background: rgba(240,255,0,0.08);
-      border: 1px solid rgba(240,255,0,0.2);
-      color: var(--accent); white-space: nowrap; flex-shrink: 0;
-    }
-    .card-badge.blue {
-      background: rgba(73,173,244,0.08);
-      border-color: rgba(73,173,244,0.2);
-      color: var(--success);
-    }
 
     .card-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
 
@@ -318,8 +221,7 @@
       font-family: var(--mono); font-size: 16px; font-weight: 700;
       color: var(--accent);
     }
-    .card-price-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
-
+  
     .btn-buy {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 9px 16px; border-radius: 20px;
@@ -381,16 +283,6 @@
     /* FOOTER */
     .footer-text { font-size: 12px; color: var(--muted); line-height: 1.7; }
 
-    .dot-a1 {
-      position: relative; width: 8px; height: 8px;
-      border-radius: 50%; background: var(--accent); flex-shrink: 0;
-    }
-    .dot-a1::after {
-      content: ''; position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%); width: 8px; height: 8px;
-      border-radius: 50%; background: var(--accent);
-      animation: dotPulse 2s ease-out infinite;
-    }
     @keyframes dotPulse {
       0%   { transform: translate(-50%,-50%) scale(1); opacity: 0.8; }
       100% { transform: translate(-50%,-50%) scale(3); opacity: 0; }
@@ -400,8 +292,6 @@
       from { opacity: 0; transform: translateY(-8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .fade-in { animation: fadeInBody 0.35s ease-out forwards; }
 
     @media (prefers-reduced-motion: reduce) {
       * { transition: none !important; animation: none !important; }
@@ -576,30 +466,23 @@
 </button>
 
 <script>
+  
 /* ── DATA PRODUK ─────────────────────────────────────
-   Ganti placeholder di sini dengan data produk asli.
-   
    Field:
-   - id          : string unik (untuk JS)
-   - type        : 'powergrade' | 'lut'
-   - category    : 'cinematic' | 'skin' | 'commercial' | dll (cocokkan dengan filter)
-   - name        : nama produk
-   - sub         : tagline singkat
-   - desc        : deskripsi 1-2 kalimat
-   - usage       : catatan penggunaan (tips singkat)
-   - compat      : 12
-   - buyers      : array format yang disupport
-   - price       : string harga (contoh: 'Rp 45.000')
-   - priceNote   : keterangan harga (contoh: 'per pack • sekali bayar')
-   - linkLynk    : URL lynk.id produk ini
-   - beforeImg   : path gambar before (kosongkan '' jika pakai gradient)
-   - afterImg    : path gambar after (kosongkan '' jika pakai gradient)
-   - beforeGrad  : warna gradient placeholder sebelum (hex)
-   - afterGrad   : warna gradient placeholder sesudah (hex)
-   - nodes       : array node dalam pipeline, format { label, desc, enabled }
-                   enabled = true → aktif by default (efek terlihat)
-                   enabled = false → disabled by default (node bisa di-toggle)
+   - id        : string unik
+   - type      : 'powergrade' | 'lut'
+   - category  : 'cinematic' | 'skin' | 'commercial' (cocokkan dengan filter)
+   - name      : nama produk
+   - sub       : tagline singkat
+   - desc      : deskripsi 1-2 kalimat
+   - usage     : tips penggunaan
+   - requires  : array dependencies (contoh: ['Tetra DCTL', 'DaVinci Resolve'])
+   - buyers    : jumlah pembeli (angka)
+   - price     : string harga (contoh: 'Rp 49.000')
+   - linkLynk  : URL lynk.id produk
+   - scenes    : array { label, before, after } — minimal 1 item
 ──────────────────────────────────────────────────── */
+  
 var products = [
   {
     id: 'teal-orange-pg',
@@ -652,26 +535,6 @@ function getFilteredProducts() {
 
 function buildGradient(hex) {
   return 'linear-gradient(135deg, ' + hex + 'cc 0%, ' + hex + '66 100%)';
-}
-
-function buildThumb(p) {
-  var thumb = document.createElement('div');
-  thumb.className = 'card-thumb';
-  thumb.onclick = function() { openCard(p.id); };
-
-  var imgHTML = p.afterImg
-    ? '<img class="thumb-img" src="' + p.afterImg + '" alt="' + p.name + '">'
-    : '<div class="thumb-placeholder" style="background:linear-gradient(135deg,' + p.afterGrad + 'cc 0%,' + p.afterGrad + '44 100%)"></div>';
-
-  var badgeLabel = p.type === 'lut' ? 'LUT' : 'PG';
-
-  thumb.innerHTML = imgHTML +
-    '<div class="thumb-info">' +
-    '<div class="thumb-name">' + p.name + '</div>' +
-    '<div class="thumb-price">' + p.price + '</div>' +
-    '</div>';
-
-  return thumb;
 }
 
 function buildExpandedCard(p) {
@@ -919,27 +782,6 @@ function autoAnimate(pid) {
   sliderStates[pid] = 0.5;
   updateSlider(pid, 0.5);
   setTimeout(function() { autoAnimate(pid); }, 100);
-}
-
-/* ── NODE TOGGLE ── */
-function toggleNode(pid, nidx, el) {
-  var p = products.find(function(x) { return x.id === pid; });
-  if (!p) return;
-  var n = p.nodes[nidx];
-
-  var effectText = document.getElementById('effectText-' + pid);
-  if (effectText) {
-    effectText.textContent = '● ' + n.label + ' — ' + n.desc;
-    effectText.classList.add('lit');
-  }
-
-  if (el.classList.contains('disabled')) {
-    el.classList.remove('disabled');
-    n.enabled = true;
-  } else {
-    el.classList.add('disabled');
-    n.enabled = false;
-  }
 }
 
   function shareProduct(pid, el) {
