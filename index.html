@@ -1014,9 +1014,8 @@ handleHash();
   var nodes = [], W, H;
 
   function init() {
-    var rect = canvas.parentElement.getBoundingClientRect();
-    W = canvas.width = rect.width;
-    H = canvas.height = rect.height;
+    W = canvas.width = canvas.offsetWidth || canvas.parentElement.offsetWidth;
+    H = canvas.height = canvas.offsetHeight || canvas.parentElement.offsetHeight;
     nodes = [];
     var count = Math.floor((W * H) / 5000);
     for (var i = 0; i < count; i++) {
@@ -1075,8 +1074,8 @@ handleHash();
   });
 
   window.addEventListener('resize', init);
-  init();
-  draw();
+  window.addEventListener('load', function() { init(); draw(); });
+  setTimeout(function() { if (!lastTime) { init(); draw(); } }, 300);
 })();
   
 </script>
