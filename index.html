@@ -364,6 +364,20 @@
       grid-template-rows: 1fr;
     }
 
+    .card-badge {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 4px;
+      background: rgba(240,255,0,0.08);
+      border: 1px solid rgba(240,255,0,0.2);
+      color: var(--accent); white-space: nowrap; flex-shrink: 0;
+    }
+    .card-badge.blue {
+      background: rgba(73,173,244,0.08);
+      border-color: rgba(73,173,244,0.2);
+      color: var(--success);
+    }
+
     .scene-tabs {
       display: flex; gap: 5px;
       padding: 10px 12px;
@@ -579,6 +593,7 @@ function buildExpandedCard(p) {
   /* card body */
   var bodyHTML = '<div class="card-body">';
   bodyHTML += '<div class="card-top"><div><div class="card-title">' + p.name + '</div><div class="card-sub">' + p.sub + '</div></div>';
+  bodyHTML += '<div class="' + (p.type === 'lut' ? 'card-badge blue' : 'card-badge') + '">' + (p.type === 'lut' ? 'LUT Pack' : 'Power Grade') + '</div>';
   bodyHTML += '</div>';
   bodyHTML += '<div class="card-desc">' + p.desc + '</div>';
   bodyHTML += '<div style="margin-bottom:10px;">';
