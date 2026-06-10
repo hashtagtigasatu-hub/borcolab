@@ -83,6 +83,14 @@
     .brand-name { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); line-height: 1; }
     .brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 3px; }
 
+    .logo-mark img {
+      animation: logoSpin 12s linear infinite;
+    }
+    @keyframes logoSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
     .btn-theme {
       margin-left: auto; flex-shrink: 0;
       width: 34px; height: 34px;
@@ -445,8 +453,8 @@
     }
     .card-expanded.open .card-exp-icon { border-color: rgba(240,255,0,0.4); }
 
-    .card-exp-title { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
-    .card-exp-sub { font-size: 11px; color: var(--accent); margin-top: 2px; }
+    .card-exp-title { font-family: var(--mono); font-size: 14px; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+    .card-exp-sub { font-size: 12px; color: var(--accent); margin-top: 2px; }
 
     .card-exp-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
