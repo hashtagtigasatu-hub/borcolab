@@ -451,10 +451,16 @@
     }
     .card-expanded.open .card-exp-chevron { transform: rotate(180deg); }
 
-    .card-exp-body { display: none; }
+    .card-exp-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-exp-body-inner {
+      overflow: hidden;
+    }
     .card-expanded.open .card-exp-body {
-      display: block;
-      animation: fadeInBody 0.4s ease-out forwards;
+      grid-template-rows: 1fr;
     }
 
     .scene-tabs {
@@ -496,6 +502,12 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    @keyframes scrollPulse {
+      0%   { transform: scaleX(0); opacity: 1; }
+      50%  { transform: scaleX(1); opacity: 1; }
+      100% { transform: scaleX(0); opacity: 0; transform-origin: right; }
+    }
     
   </style>
 </head>
@@ -525,6 +537,11 @@
       <div class="hero-title">Power Grade & <span>LUT Library</span></div>
       <div class="hero-desc">Power grade dan LUT untuk DaVinci Resolve • Geser slider pada setiap produk untuk melihat perbedaan before-after.</div>
     </div>
+    <div id="scrollIndicator" style="display:flex;justify-content:center;margin:-8px 0 16px;transition:opacity 0.4s ease;opacity:1;">
+    <div style="width:32px;height:2px;border-radius:2px;background:var(--border);position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:var(--accent);animation:scrollPulse 1.8s ease-in-out infinite;transform-origin:left;"></div>
+    </div>
+  </div>
   </div>
 
   <!-- FILTER -->
@@ -744,9 +761,11 @@ function buildExpandedCard(p) {
       '</div>' +
     '</div>' +
     '<div class="card-exp-body" id="expBody-' + p.id + '">' +
-      simHTML + bodyHTML +
+      '<div class="card-exp-body-inner">' +
+        simHTML + bodyHTML +
+      '</div>' +
     '</div>';
-
+  
   return card;
 }
 /* ── TOGGLE CARD ── */
@@ -1056,6 +1075,18 @@ handleHash();
   init();
   draw();
 })();
+
+  window.addEventListener('scroll', function() {
+  var indicator = document.getElementById('scrollIndicator');
+  if (indicator) {
+    if (window.scrollY > 40) {
+      indicator.style.opacity = '0';
+      indicator.style.pointerEvents = 'none';
+    } else {
+      indicator.style.opacity = '1';
+    }
+  }
+}, { passive: true });
   
 </script>
 </body>
