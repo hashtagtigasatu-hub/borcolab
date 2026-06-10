@@ -180,20 +180,15 @@
       flex-shrink: 0; color: #333;
     }
     .sim-label {
-      position: absolute; top: 8px; z-index: 10;
-      font-family: var(--mono); font-size: 9px; font-weight: 700;
-      letter-spacing: 0.15em; padding: 4px 10px; border-radius: 20px;
-      pointer-events: none; text-transform: uppercase;
-      transition: opacity 0.2s;
+      position: absolute; top: 50%; z-index: 10;
+      transform: translateY(-50%);
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      pointer-events: none;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
     }
-    .sim-label-before {
-      right: calc(100% - var(--div-pos, 50%) + 8px);
-      background: rgba(255,69,69,0.85); color: #fff;
-    }
-    .sim-label-after {
-      left: calc(var(--div-pos, 50%) + 8px);
-      background: rgba(73,173,244,0.85); color: #fff;
-    }
+    .sim-label-before { right: 10px; color: rgba(255,255,255,0.75); }
+    .sim-label-after  { left: 10px;  color: rgba(255,255,255,0.75); }
 
     /* GRADIENT PLACEHOLDER (when no image) */
     .sim-placeholder {
@@ -839,12 +834,10 @@ function initSlider(pid) {
 function updateSlider(pid, pos) {
   var after = document.getElementById('simAfter-' + pid);
   var divider = document.getElementById('simDiv-' + pid);
-  var wrap = document.getElementById('sim-' + pid);
   if (!after || !divider) return;
   var pct = (pos * 100).toFixed(2);
   after.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
   divider.style.left = pct + '%';
-  if (wrap) wrap.style.setProperty('--div-pos', pct + '%');
 }
 
 function autoAnimate(pid) {
