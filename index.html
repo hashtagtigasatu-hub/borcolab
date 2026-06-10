@@ -455,7 +455,11 @@
       animation: fadeInBody 0.4s ease-out forwards;
     }
 
-    .scene-tabs { display: flex; gap: 5px; padding: 10px 12px 0; }
+    .scene-tabs {
+      display: flex; gap: 5px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
     .scene-tab {
       font-family: var(--mono); font-size: 10px; font-weight: 700;
       letter-spacing: 0.08em; padding: 5px 10px; border-radius: 20px;
@@ -468,6 +472,18 @@
       border-color: rgba(240,255,0,0.35);
       color: var(--accent);
     }
+
+    .btn-share {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 9px 14px; border-radius: 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; color: var(--muted); cursor: pointer;
+      transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-share:active { transform: scale(0.96); }
+    .btn-share.copied { border-color: rgba(240,255,0,0.4); color: var(--accent); }
     
   </style>
 </head>
@@ -644,9 +660,10 @@ function buildExpandedCard(p) {
   card.className = 'card-expanded';
   card.id = 'card-exp-' + p.id;
 
-  var iconHTML = p.afterImg
-    ? '<img src="' + p.afterImg + '" alt="' + p.name + '">'
-    : '<div class="icon-grad" style="background:linear-gradient(135deg,' + p.afterGrad + 'cc,' + p.afterGrad + '44)"></div>';
+  var iconSrc = p.scenes && p.scenes[0] && p.scenes[0].after ? p.scenes[0].after : '';
+  var iconHTML = iconSrc
+    ? '<img src="' + iconSrc + '" alt="' + p.name + '">'
+    : '<div class="icon-grad" style="background:linear-gradient(135deg,' + (p.afterGrad||'#444') + 'cc,' + (p.afterGrad||'#444') + '44)"></div>';
 
   /* simulator HTML */
   var firstScene = p.scenes[0];
@@ -691,9 +708,14 @@ function buildExpandedCard(p) {
   bodyHTML += '</div>';
   bodyHTML += '<div class="card-footer">';
   bodyHTML += '<div><div class="card-price">' + p.price + '</div><div class="card-price-sub">' + p.priceNote + '</div></div>';
+  bodyHTML += '<div style="display:flex;gap:8px;align-items:center;">';
+  bodyHTML += '<button class="btn-share" onclick="shareProduct(\'' + p.id + '\',this)">';
+  bodyHTML += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+  bodyHTML += 'Bagikan</button>';
   bodyHTML += '<a class="btn-buy" href="' + p.linkLynk + '" target="_blank" rel="noopener">';
   bodyHTML += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>';
-  bodyHTML += 'Beli Sekarang</a></div></div>';
+  bodyHTML += 'Beli Sekarang</a>';
+  bodyHTML += '</div></div>';
 
   card.innerHTML =
     '<div class="card-exp-header" onclick="toggleCard(\'' + p.id + '\')">' +
@@ -889,6 +911,25 @@ function toggleNode(pid, nidx, el) {
     el.classList.add('disabled');
     n.enabled = false;
   }
+}
+
+  function shareProduct(pid, el) {
+  var base = window.location.href.split('#')[0];
+  var url = base + '#' + pid;
+
+  if (navigator.share) {
+    navigator.share({ title: document.title, url: url });
+    return;
+  }
+
+  navigator.clipboard.writeText(url).then(function() {
+    el.classList.add('copied');
+    el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Tersalin!';
+    setTimeout(function() {
+      el.classList.remove('copied');
+      el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Bagikan';
+    }, 2000);
+  });
 }
 
 /* ── FILTER ── */
