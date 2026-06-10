@@ -454,6 +454,20 @@
       display: block;
       animation: fadeInBody 0.4s ease-out forwards;
     }
+
+    .scene-tabs { display: flex; gap: 5px; padding: 10px 12px 0; }
+    .scene-tab {
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; padding: 5px 10px; border-radius: 20px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer;
+      transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+    }
+    .scene-tab.active {
+      background: rgba(240,255,0,0.08);
+      border-color: rgba(240,255,0,0.35);
+      color: var(--accent);
+    }
     
   </style>
 </head>
@@ -536,7 +550,8 @@
    - sub         : tagline singkat
    - desc        : deskripsi 1-2 kalimat
    - usage       : catatan penggunaan (tips singkat)
-   - compat      : array format yang disupport
+   - compat      : 12
+   - buyers      : array format yang disupport
    - price       : string harga (contoh: 'Rp 45.000')
    - priceNote   : keterangan harga (contoh: 'per pack • sekali bayar')
    - linkLynk    : URL lynk.id produk ini
@@ -558,11 +573,13 @@ var products = [
     desc: 'Power grade sinematik klasik dengan split teal-orange. Skin tone dijaga hangat lewat qualifier terpisah, shadow didorong ke cyan-teal secara selektif.',
     usage: 'Cocok untuk footage dengan pencahayaan warm dan background neutral/cool. Skin harus exposed dengan benar — jika clipped, qualifier akan misbehave.',
     requires: ['Tetra DCTL', 'DaVinci Resolve', 'BMD Film 4K / S-Log3'],
+    buyers: 13,
     price: 'Rp 579.000',
     priceNote: 'sekali bayar · download langsung',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_TEAL_ORANGE',
-    beforeImg: 't1709.jpg',
-    afterImg: 't1final.jpg',
+    scenes: [
+      { label: 'Scene 1', before: 't1709.jpg', after: 't1final.jpg' },
+    ],
   },
   
   {
@@ -574,11 +591,14 @@ var products = [
     desc: 'Koleksi 8 LUT kreatif dalam format .cube. Mencakup mood cool-desaturated, warm-contrast, dan bleach bypass. Cocok untuk narrative, short film, dan konten sinematik.',
     usage: 'Apply setelah CST atau log-to-linear conversion. Strength direkomendasikan 65–85% — jangan full 100% kecuali look memang sangat bold.',
     requires: ['.cube 33pt', 'DaVinci Resolve', 'Premiere Pro', 'FCPX', 'Lumafusion'],
+    buyers: 13,
     price: 'Rp 597.000',
     priceNote: '8 LUT · sekali bayar',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_CINEMATIC_PACK',
-    beforeImg: 't2709.jpg',
-    afterImg: 't2final.jpg',
+    scenes: [
+      { label: 'Scene 1', before: 't2709.jpg', after: 't2final.jpg' },
+      { label: 'Scene 2', before: 't2b709.jpg', after: 't2bfinal.jpg' },
+    ],
   },
 ];
 
@@ -629,10 +649,21 @@ function buildExpandedCard(p) {
     : '<div class="icon-grad" style="background:linear-gradient(135deg,' + p.afterGrad + 'cc,' + p.afterGrad + '44)"></div>';
 
   /* simulator HTML */
-  var simHTML = '<div class="sim-wrap" id="sim-' + p.id + '">';
-  if (p.beforeImg) {
-    simHTML += '<img class="sim-img sim-before" src="' + p.beforeImg + '" alt="Before" draggable="false">';
-    simHTML += '<img class="sim-img sim-after" id="simAfter-' + p.id + '" src="' + p.afterImg + '" alt="After" draggable="false">';
+  var firstScene = p.scenes[0];
+  var tabsHTML = '';
+  if (p.scenes.length > 1) {
+    tabsHTML = '<div class="scene-tabs" id="sceneTabs-' + p.id + '">';
+    p.scenes.forEach(function(sc, i) {
+      tabsHTML += '<button class="scene-tab' + (i === 0 ? ' active' : '') + '" onclick="switchScene(\'' + p.id + '\',' + i + ',this)">' + sc.label + '</button>';
+    });
+    tabsHTML += '</div>';
+  }
+
+  var simHTML = tabsHTML;
+  simHTML += '<div class="sim-wrap" id="sim-' + p.id + '">';
+  if (firstScene.before) {
+    simHTML += '<img class="sim-img sim-before" id="simBefore-' + p.id + '" src="' + firstScene.before + '" alt="Before" draggable="false">';
+    simHTML += '<img class="sim-img sim-after" id="simAfter-' + p.id + '" src="' + firstScene.after + '" alt="After" draggable="false">';
   } else {
     simHTML += '<div class="sim-placeholder sim-before" style="background:linear-gradient(135deg,' + p.beforeGrad + 'cc,' + p.beforeGrad + '44)"><span>Before</span></div>';
     simHTML += '<div class="sim-img sim-after sim-placeholder" id="simAfter-' + p.id + '" style="background:linear-gradient(135deg,' + p.afterGrad + 'cc,' + p.afterGrad + '44)"><span style="color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:0.1em">' + p.name + '</span></div>';
@@ -654,6 +685,10 @@ function buildExpandedCard(p) {
   p.requires.forEach(function(c) { bodyHTML += '<span class="compat-chip">' + c + '</span>'; });
   bodyHTML += '</div></div>';
   bodyHTML += '<div class="usage-note"><strong>Tips:</strong> ' + p.usage + '</div>';
+  bodyHTML += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">';
+  bodyHTML += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="color:var(--muted);flex-shrink:0"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>';
+  bodyHTML += '<span style="font-family:var(--mono);font-size:10px;color:var(--muted);">' + p.buyers + ' colorist sudah menggunakan ini</span>';
+  bodyHTML += '</div>';
   bodyHTML += '<div class="card-footer">';
   bodyHTML += '<div><div class="card-price">' + p.price + '</div><div class="card-price-sub">' + p.priceNote + '</div></div>';
   bodyHTML += '<a class="btn-buy" href="' + p.linkLynk + '" target="_blank" rel="noopener">';
@@ -816,6 +851,25 @@ function autoAnimate(pid) {
   requestAnimationFrame(step);
 }
 
+  function switchScene(pid, idx, el) {
+  var p = products.find(function(x) { return x.id === pid; });
+  if (!p) return;
+  var sc = p.scenes[idx];
+
+  var before = document.getElementById('simBefore-' + pid);
+  var after = document.getElementById('simAfter-' + pid);
+  if (before) before.src = sc.before;
+  if (after) after.src = sc.after;
+
+  var tabs = document.querySelectorAll('#sceneTabs-' + pid + ' .scene-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+
+  sliderStates[pid] = 0.5;
+  updateSlider(pid, 0.5);
+  setTimeout(function() { autoAnimate(pid); }, 100);
+}
+
 /* ── NODE TOGGLE ── */
 function toggleNode(pid, nidx, el) {
   var p = products.find(function(x) { return x.id === pid; });
@@ -864,6 +918,26 @@ window.addEventListener('scroll', function() {
 
 /* ── INIT ── */
 renderProducts();
+
+function handleHash() {
+  var hash = window.location.hash.replace('#', '');
+  if (!hash) return;
+  var card = document.getElementById('card-exp-' + hash);
+  if (!card) return;
+  if (!card.classList.contains('open')) {
+    card.classList.add('open');
+    sliderStates[hash] = 0.5;
+    initSlider(hash);
+  }
+  setTimeout(function() {
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(function() { autoAnimate(hash); }, 300);
+  }, 100);
+}
+
+window.addEventListener('hashchange', handleHash);
+handleHash();
+  
 </script>
 </body>
 </html>
