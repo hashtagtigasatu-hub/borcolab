@@ -757,6 +757,7 @@ function buildExpandedCard(p) {
   
   return card;
 }
+  
 /* ── TOGGLE CARD ── */
 function toggleCard(pid) {
   var allCards = document.querySelectorAll('.card-expanded');
@@ -775,7 +776,7 @@ function toggleCard(pid) {
       card.scrollIntoView({ behavior: 'smooth', block: 'start' });
       initSlider(pid);
       setTimeout(function() { autoAnimate(pid); }, 300);
-    }, 50);
+    }, 300);
   }
 }
 
@@ -784,11 +785,12 @@ function openCard(pid) {
   if (!card) return;
   if (!card.classList.contains('open')) {
     card.classList.add('open');
+    sliderStates[pid] = 0.5;
     setTimeout(function() {
       card.scrollIntoView({ behavior: 'smooth', block: 'start' });
       initSlider(pid);
-      autoAnimate(pid);
-    }, 50);
+      setTimeout(function() { autoAnimate(pid); }, 300);
+    }, 380);
   } else {
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
