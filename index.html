@@ -67,7 +67,7 @@
       transition: background 0.3s, border-color 0.3s;
     }
 
-    .logo-mark { width: 36px; height: 36px; background: transparent; border-radius: 8px; flex-shrink: 0; }
+    .logo-mark { width: 39px; height: 39px; background: transparent; border-radius: 8px; flex-shrink: 0; }
     .logo-mark img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
     .brand-name { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: var(--text); line-height: 1; }
     .brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 3px; }
@@ -91,10 +91,7 @@
       border-radius: var(--radius); position: relative; overflow: hidden;
       transition: background 0.3s, border-color 0.3s;
     }
-    .hero::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0;
-      height: 3px; background: var(--accent);
-    }
+    
     .hero-tag {
       font-family: var(--mono); font-size: 10px; font-weight: 700;
       letter-spacing: 0.25em; text-transform: uppercase;
@@ -187,9 +184,16 @@
       font-family: var(--mono); font-size: 9px; font-weight: 700;
       letter-spacing: 0.15em; padding: 4px 10px; border-radius: 20px;
       pointer-events: none; text-transform: uppercase;
+      transition: opacity 0.2s;
     }
-    .sim-label-before { right: 8px; background: rgba(255,69,69,0.85); color: #fff; }
-    .sim-label-after  { left: 8px;  background: rgba(73,173,244,0.85); color: #fff; }
+    .sim-label-before {
+      right: calc(100% - var(--div-pos, 50%) + 8px);
+      background: rgba(255,69,69,0.85); color: #fff;
+    }
+    .sim-label-after {
+      left: calc(var(--div-pos, 50%) + 8px);
+      background: rgba(73,173,244,0.85); color: #fff;
+    }
 
     /* GRADIENT PLACEHOLDER (when no image) */
     .sim-placeholder {
@@ -616,8 +620,8 @@ var products = [
     price: 'Rp 597.000',
     linkLynk: 'https://lynk.id/borneocolorlab/PLACEHOLDER_CINEMATIC_PACK',
     scenes: [
-      { label: 'Scene 1', before: 't2709.jpg', after: 't2final.jpg' },
-      { label: 'Scene 2', before: 't2709.jpg', after: 't2bfinal.jpg' },
+      { label: 'LUT 1', before: 't2709.jpg', after: 't2final.jpg' },
+      { label: 'LUT 2', before: 't2709.jpg', after: 't2bfinal.jpg' },
     ],
   },
 ];
@@ -682,6 +686,8 @@ function buildExpandedCard(p) {
 
   var simHTML = tabsHTML;
   simHTML += '<div class="sim-wrap" id="sim-' + p.id + '">';
+  simHTML += '<div class="sim-label sim-label-before">Before</div>';
+  simHTML += '<div class="sim-label sim-label-after">After</div>';
   if (firstScene.before) {
     simHTML += '<img class="sim-img sim-before" id="simBefore-' + p.id + '" src="' + firstScene.before + '" alt="Before" draggable="false">';
     simHTML += '<img class="sim-img sim-after" id="simAfter-' + p.id + '" src="' + firstScene.after + '" alt="After" draggable="false">';
@@ -833,10 +839,12 @@ function initSlider(pid) {
 function updateSlider(pid, pos) {
   var after = document.getElementById('simAfter-' + pid);
   var divider = document.getElementById('simDiv-' + pid);
+  var wrap = document.getElementById('sim-' + pid);
   if (!after || !divider) return;
   var pct = (pos * 100).toFixed(2);
   after.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
   divider.style.left = pct + '%';
+  if (wrap) wrap.style.setProperty('--div-pos', pct + '%');
 }
 
 function autoAnimate(pid) {
