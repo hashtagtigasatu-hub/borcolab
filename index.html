@@ -491,6 +491,16 @@
     }
     .btn-share:active { transform: scale(0.96); }
     .btn-share.copied { border-color: rgba(240,255,0,0.4); color: var(--accent); }
+
+    .card-expanded {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s, border-color 0.3s;
+    }
+    .card-expanded.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
     
   </style>
 </head>
@@ -514,14 +524,12 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-tag">Creative Color Tools</div>
-    <div class="hero-title">Power Grade & <span>LUT Library</span></div>
-    <!--<div class="hero-pills">
-      <span class="hero-pill">DaVinci Resolve</span>
-      <span class="hero-pill">.cube • .dctl • .drp</span>
-      <span class="hero-pill">Production Ready</span>
-    </div>-->
-    <div class="hero-desc">Geser slider pada setiap produk untuk melihat perbedaan before-after.</div>
+    <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.2;"></canvas>
+    <div style="position:relative;z-index:1;">
+      <div class="hero-tag">Creative Color Tools</div>
+      <div class="hero-title">Power Grade & <span>LUT Library</span></div>
+      <div class="hero-desc">Geser slider pada setiap produk untuk melihat perbedaan before-after secara langsung.</div>
+    </div>
   </div>
 
   <!-- FILTER -->
@@ -540,7 +548,7 @@
   </div>
   
   <!-- TOMBOL WA -->
-  <div style="text-align:center;padding:32px 0 0;">
+  <div style="text-align:center;padding:32px 0 0;border-top:1px solid var(--border);">
       <a href="https://wa.me/6282252445233?text=Halo%20Borneo%20Color%20Lab!%20Saya%20mau%20tanya%20tentang%20Power%20Grade%20%26%20LUT%20yang%20tersedia%20%F0%9F%98%8A"
         style="display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:20px;background:var(--wa);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.06em;color:#fff;text-decoration:none;-webkit-tap-highlight-color:transparent;"
         target="_blank" rel="noopener">
@@ -795,10 +803,13 @@ function renderProducts() {
   }
   empty.classList.remove('visible');
 
-  filtered.forEach(function(p) {
-    list.appendChild(buildExpandedCard(p));
+  filtered.forEach(function(p, i) {
+    var card = buildExpandedCard(p);
+    list.appendChild(card);
+    setTimeout(function() {
+      card.classList.add('visible');
+    }, 100 + i * 120);
   });
-}
   
 /* ── SLIDER ── */
 function initSlider(pid) {
@@ -990,6 +1001,65 @@ function handleHash() {
 
 window.addEventListener('hashchange', handleHash);
 handleHash();
+
+  (function() {
+  var canvas = document.getElementById('heroCanvas');
+  var ctx = canvas.getContext('2d');
+  var nodes = [], W, H;
+
+  function init() {
+    var rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width;
+    H = canvas.height = rect.height;
+    nodes = [];
+    var count = Math.floor((W * H) / 5000);
+    for (var i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        r: Math.random() * 1.5 + 0.5,
+        c: Math.random() > 0.6 ? '#f0ff00' : '#49adf4'
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < nodes.length; i++) {
+      for (var j = i + 1; j < nodes.length; j++) {
+        var dx = nodes[i].x - nodes[j].x;
+        var dy = nodes[i].y - nodes[j].y;
+        var d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 90) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = 'rgba(73,156,219,' + (0.3 * (1 - d/90)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    nodes.forEach(function(n) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = n.c;
+      ctx.globalAlpha = 0.6;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', init);
+  init();
+  draw();
+})();
   
 </script>
 </body>
