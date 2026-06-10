@@ -593,7 +593,6 @@ function buildExpandedCard(p) {
   /* card body */
   var bodyHTML = '<div class="card-body">';
   bodyHTML += '<div class="card-top"><div><div class="card-title">' + p.name + '</div><div class="card-sub">' + p.sub + '</div></div>';
-  bodyHTML += '<div class="' + (p.type === 'lut' ? 'card-badge blue' : 'card-badge') + '">' + (p.type === 'lut' ? 'LUT Pack' : 'Power Grade') + '</div>';
   bodyHTML += '</div>';
   bodyHTML += '<div class="card-desc">' + p.desc + '</div>';
   bodyHTML += '<div style="margin-bottom:10px;">';
