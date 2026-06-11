@@ -407,6 +407,56 @@
     }
     .btn-share:active { transform: scale(0.96); }
     .btn-share.copied { border-color: rgba(240,255,0,0.4); color: var(--accent); }
+
+    /* FAQ */
+    .faq-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .faq-header {
+      padding: 14px 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      user-select: none; -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .faq-header:active { background: var(--surface2); }
+    .faq-item.open .faq-header { border-bottom-color: var(--border); }
+    .faq-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .faq-question {
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      color: var(--text); line-height: 1.4;
+    }
+    .faq-chevron {
+      font-size: 12px; color: var(--text); flex-shrink: 0;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-body {
+      display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .faq-body-inner { overflow: hidden; }
+    .faq-item.open .faq-body { grid-template-rows: 1fr; }
+    .faq-answer {
+      padding: 14px 16px;
+      font-size: 13px; color: var(--muted); line-height: 1.7;
+    }
+
+    /* DOT ANIMASI FAQ */
+    .dot-faq {
+      position: relative; width: 8px; height: 8px;
+      border-radius: 50%; background: var(--accent);
+      flex-shrink: 0;
+    }
+    .dot-faq::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%); width: 8px; height: 8px;
+      border-radius: 50%; background: var(--accent);
+      animation: dotPulse 2s ease-out infinite;
+    }
     
   </style>
 </head>
@@ -434,7 +484,7 @@
     <div style="position:relative;z-index:1;">
       <div class="hero-tag">Creative Color Tools</div>
       <div class="hero-title">Power Grade & <span>LUT Library</span></div>
-      <div class="hero-desc">Power grade dan LUT untuk DaVinci Resolve • Geser slider pada setiap produk untuk melihat perbedaan before-after.</div>
+      <div class="hero-desc">Power Grade dan LUT untuk DaVinci Resolve • Geser slider pada setiap produk untuk melihat perbedaan before-after.</div>
     </div>
   </div>
 
@@ -454,7 +504,7 @@
   </div>
   
   <!-- TOMBOL WA -->
-  <div style="text-align:center;padding:32px 0 0;border-top:1px solid var(--border);margin-top:24px;">
+  <!--<div style="text-align:center;padding:32px 0 0;border-top:1px solid var(--border);margin-top:24px;">
       <a href="https://wa.me/6282252445233?text=Halo%20Borneo%20Color%20Lab!%20Saya%20mau%20tanya%20tentang%20Power%20Grade%20%26%20LUT%20yang%20tersedia%20%F0%9F%98%8A"
         style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;background:var(--wa);font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.06em;color:#fff;text-decoration:none;-webkit-tap-highlight-color:transparent;"
         target="_blank" rel="noopener">
@@ -463,8 +513,115 @@
         </svg>
         Tanya-tanya
       </a>
+    </div>-->
+
+  <!-- FAQ -->
+  <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:24px;">
+    <div class="cat-label" style="margin-top:0;">Pertanyaan Umum</div>
+
+    <div class="faq-item" id="faq-1">
+      <div class="faq-header" onclick="toggleFaq('faq-1')">
+        <div class="faq-left">
+          <div class="dot-faq"></div>
+          <span class="faq-question">Bagaimana cara install Power Grade di DaVinci Resolve?</span>
+        </div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-body-inner">
+          <div class="faq-answer">Import file .drp ke DaVinci Resolve melalui menu Gallery → Import Grade. Power grade akan langsung tersedia di Gallery dan bisa di-apply ke clip manapun.</div>
+        </div>
+      </div>
     </div>
 
+    <div class="faq-item" id="faq-2">
+      <div class="faq-header" onclick="toggleFaq('faq-2')">
+        <div class="faq-left">
+          <div class="dot-faq"></div>
+          <span class="faq-question">LUT Pack kompatibel dengan aplikasi apa saja?</span>
+        </div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-body-inner">
+          <div class="faq-answer">Format .cube 33pt kompatibel dengan DaVinci Resolve, Adobe Premiere Pro, Final Cut Pro X, dan Lumafusion. Bisa dipakai di hampir semua NLE yang mendukung LUT.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" id="faq-3">
+      <div class="faq-header" onclick="toggleFaq('faq-3')">
+        <div class="faq-left">
+          <div class="dot-faq"></div>
+          <span class="faq-question">Apakah butuh plugin berbayar tambahan?</span>
+        </div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-body-inner">
+          <div class="faq-answer">Power grade tertentu memerlukan Tetra DCTL dan DRT yang tercantum di bagian Requires setiap produk. LUT Pack tidak memerlukan plugin tambahan apapun.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" id="faq-4">
+      <div class="faq-header" onclick="toggleFaq('faq-4')">
+        <div class="faq-left">
+          <div class="dot-faq"></div>
+          <span class="faq-question">Bagaimana cara download setelah beli?</span>
+        </div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-body-inner">
+          <div class="faq-answer">Setelah pembayaran selesai di lynk.id, link download akan langsung tersedia di halaman konfirmasi. File juga dikirim ke email yang digunakan saat checkout.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" id="faq-5">
+      <div class="faq-header" onclick="toggleFaq('faq-5')">
+        <div class="faq-left">
+          <div class="dot-faq"></div>
+          <span class="faq-question">Cocok untuk footage dari kamera apa?</span>
+        </div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-body-inner">
+          <div class="faq-answer">Cek bagian Requires di setiap produk untuk kompatibilitas kamera spesifik. Secara umum, power grade dioptimalkan untuk log footage — BMD Film, S-Log3, dan C-Log.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" id="faq-6">
+      <div class="faq-header" onclick="toggleFaq('faq-6')">
+        <div class="faq-left">
+          <div class="dot-faq"></div>
+          <span class="faq-question">Masih ada pertanyaan lain?</span>
+        </div>
+        <div class="faq-chevron">▼</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-body-inner">
+          <div class="faq-answer" style="display:flex;flex-direction:column;gap:10px;">
+            <span>Chat langsung sebelum beli — kami siap membantu memilih produk yang paling sesuai dengan workflow kamu.</span>
+            <a href="https://wa.me/6282252445233?text=Halo%20Borneo%20Color%20Lab!%20Saya%20mau%20tanya%20tentang%20Power%20Grade%20%26%20LUT%20yang%20tersedia%20%F0%9F%98%8A"
+              style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;background:var(--wa);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:0.06em;color:#fff;text-decoration:none;align-self:flex-start;"
+              target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.79.49 3.57 1.4 5.12L2 22l5.12-1.51c1.49.82 3.17 1.26 4.92 1.26 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.84 9.84 0 0012.04 2z"/>
+              </svg>
+              Tanya-tanya
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  
+  <!-- FOOTER -->
   <div style="text-align:center;padding:24px 0 0;">
     <div class="footer-text">BORNEO COLOR LAB • Made in Borneo</div>
   </div>
@@ -957,6 +1114,14 @@ handleHash();
   window.addEventListener('load', function() { init(); draw(); });
   setTimeout(function() { if (!lastTime) { init(); draw(); } }, 300);
 })();
+
+  function toggleFaq(id) {
+  var items = document.querySelectorAll('.faq-item');
+  items.forEach(function(item) {
+    if (item.id !== id) item.classList.remove('open');
+  });
+  document.getElementById(id).classList.toggle('open');
+}
   
 </script>
 </body>
