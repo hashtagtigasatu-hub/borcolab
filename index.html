@@ -457,6 +457,12 @@
       border-radius: 50%; background: var(--accent);
       animation: dotPulse 2s ease-out infinite;
     }
+
+    .card-badge.red {
+      background: rgba(255,69,69,0.08);
+      border-color: rgba(255,69,69,0.2);
+      color: var(--danger);
+    }
     
   </style>
 </head>
@@ -800,7 +806,7 @@ function buildExpandedCard(p) {
         '<div><div class="card-exp-title">' + p.name + '</div><div class="card-exp-sub">' + p.price + '</div></div>' +
       '</div>' +
       '<div class="card-exp-right">' +
-        '<div class="' + (p.type === 'lut' ? 'card-badge blue' : 'card-badge') + '">' + (p.bundle ? 'Power Grade + LUT' : (p.type === 'lut' ? 'LUT Pack' : 'Power Grade')) + '</div>' +
+        '<div class="' + (p.bundle ? 'card-badge red' : (p.type === 'lut' ? 'card-badge blue' : 'card-badge')) + '">' + (p.bundle ? 'Power Grade + LUT' : (p.type === 'lut' ? 'LUT Pack' : 'Power Grade')) + '</div>' +
         '<div class="card-exp-chevron">▼</div>' +
       '</div>' +
     '</div>' +
