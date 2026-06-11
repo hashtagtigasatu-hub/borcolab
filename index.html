@@ -800,7 +800,7 @@ function buildExpandedCard(p) {
         '<div><div class="card-exp-title">' + p.name + '</div><div class="card-exp-sub">' + p.price + '</div></div>' +
       '</div>' +
       '<div class="card-exp-right">' +
-        '<div class="' + (p.type === 'lut' ? 'card-badge blue' : 'card-badge') + '">' + (p.type === 'lut' ? 'LUT Pack' : 'Power Grade') + '</div>' +
+        '<div class="' + (p.type === 'lut' ? 'card-badge blue' : 'card-badge') + '">' + (p.bundle ? 'Power Grade + LUT' : (p.type === 'lut' ? 'LUT Pack' : 'Power Grade')) + '</div>' +
         '<div class="card-exp-chevron">▼</div>' +
       '</div>' +
     '</div>' +
